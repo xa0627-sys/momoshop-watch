@@ -30,6 +30,7 @@ const STATE = {
 
 const fetchText = async (fileName) => {
   const candidates = [fileName];
+  const resolvedBase = new URL(document.baseURI);
 
   if (fileName.startsWith('data/')) {
     candidates.push(`../${fileName}`);
@@ -38,14 +39,15 @@ const fetchText = async (fileName) => {
   let lastError = null;
 
   for (const candidate of candidates) {
+    const targetUrl = new URL(candidate, resolvedBase).toString();
     try {
-      const response = await fetch(encodeURI(candidate));
+      const response = await fetch(encodeURI(targetUrl));
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
       return response.text();
     } catch (error) {
-      lastError = `${candidate} (${error.message})`;
+      lastError = `${targetUrl} (${error.message})`;
     }
   }
 
