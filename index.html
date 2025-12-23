@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>購物商品規格搜尋</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-content">
+      <p class="eyebrow">GitHub Pages</p>
+      <h1>購物商品規格搜尋</h1>
+      <p class="subtitle">依照商品分類整理 momo / Shopee 商品，快速搜尋規格與重點資訊。</p>
+      <div class="meta" id="dataStatus">載入資料中...</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="controls">
+      <label>
+        分類
+        <select id="categorySelect">
+          <option value="all">全部分類</option>
+        </select>
+      </label>
+      <label>
+        平台
+        <select id="sourceSelect">
+          <option value="all">全部平台</option>
+        </select>
+      </label>
+      <label class="search">
+        規格關鍵字
+        <input id="searchInput" type="search" placeholder="輸入規格、品牌、型號..." />
+      </label>
+      <button id="resetFilters" type="button">重設篩選</button>
+    </section>
+
+    <section class="stats">
+      <div>
+        <strong id="resultCount">0</strong>
+        <span>筆商品</span>
+      </div>
+      <div class="note">提示：搜尋會涵蓋商品名稱、規格與價格。</div>
+    </section>
+
+    <section id="results" class="grid"></section>
+  </main>
+
+  <template id="cardTemplate">
+    <article class="card">
+      <div class="card-image"></div>
+      <div class="card-body">
+        <div class="card-tags"></div>
+        <h3 class="card-title"></h3>
+        <p class="card-price"></p>
+        <p class="card-spec"></p>
+        <a class="card-link" target="_blank" rel="noopener">前往商品頁</a>
+      </div>
+    </article>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>
