@@ -11,13 +11,13 @@ const DATA_SOURCES = [
   {
     id: 'momoshop',
     label: 'momo購物網',
-    listFile: 'momoshop-2025-12-23.csv',
-    detailFile: '從-momoshop.com.tw-抓取細節-2025-12-23.csv',
+    listFile: 'data/momoshop-2025-12-23.csv',
+    detailFile: 'data/momoshop-detail-2025-12-23.csv',
   },
   {
     id: 'shopee',
     label: 'Shopee',
-    listFile: 'shopee-2025-12-23.csv',
+    listFile: 'data/shopee-2025-12-23.csv',
   },
 ];
 
@@ -29,11 +29,29 @@ const STATE = {
 };
 
 const fetchText = async (fileName) => {
-  const response = await fetch(encodeURI(fileName));
-  if (!response.ok) {
-    throw new Error(`無法載入 ${fileName}`);
+  const candidates = [fileName];
+  const resolvedBase = new URL(document.baseURI);
+
+  if (fileName.startsWith('data/')) {
+    candidates.push(`../${fileName}`);
   }
-  return response.text();
+
+  let lastError = null;
+
+  for (const candidate of candidates) {
+    const targetUrl = new URL(candidate, resolvedBase).toString();
+    try {
+      const response = await fetch(encodeURI(targetUrl));
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      return response.text();
+    } catch (error) {
+      lastError = `${targetUrl} (${error.message})`;
+    }
+  }
+
+  throw new Error(`無法載入 ${fileName}，嘗試路徑：${candidates.join('、')}，錯誤：${lastError}`);
 };
 
 const parseCsv = (text) => {
@@ -83,7 +101,7 @@ const parseCsv = (text) => {
 
 const rowsToObjects = (rows) => {
   if (!rows.length) return [];
-  const header = rows[0].map((cell) => cell.trim());
+  const header = rows[0].map((cell) => cell.replace(/^\ufeff/, '').trim());
   return rows.slice(1).map((row) => {
     const obj = {};
     header.forEach((key, index) => {
