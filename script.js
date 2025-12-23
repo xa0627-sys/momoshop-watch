@@ -29,11 +29,27 @@ const STATE = {
 };
 
 const fetchText = async (fileName) => {
-  const response = await fetch(encodeURI(fileName));
-  if (!response.ok) {
-    throw new Error(`無法載入 ${fileName}`);
+  const candidates = [fileName];
+
+  if (fileName.startsWith('data/')) {
+    candidates.push(`../${fileName}`);
   }
-  return response.text();
+
+  let lastError = null;
+
+  for (const candidate of candidates) {
+    try {
+      const response = await fetch(encodeURI(candidate));
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      return response.text();
+    } catch (error) {
+      lastError = `${candidate} (${error.message})`;
+    }
+  }
+
+  throw new Error(`無法載入 ${fileName}，嘗試路徑：${candidates.join('、')}，錯誤：${lastError}`);
 };
 
 const parseCsv = (text) => {
